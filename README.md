@@ -43,9 +43,11 @@ fork.
 
 ## Licensing
 
-See [THIRD_PARTY.md](THIRD_PARTY.md) and [LICENSE](LICENSE). The original game client is a binary
-dependency; this repository has only the new client's own source code, not the original client's
-source or its converted content (which is not checked into Git).
+This project's own code is licensed under the **GNU General Public License v3.0** (see
+[LICENSE](LICENSE)), inherited from the upstream OpenDAoC-based project this fork came from. See
+[THIRD_PARTY.md](THIRD_PARTY.md) for the new client's own dependencies and their licenses. The
+original game client is a binary dependency; this repository has only the new client's own source
+code, not the original client's source or its converted content (which is not checked into Git).
 
 ## Upstream
 

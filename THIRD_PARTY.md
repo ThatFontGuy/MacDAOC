@@ -1,5 +1,9 @@
 # Existing projects and notices
 
+This project's own code (`source/new-client`) is licensed under **GPLv3** (see [LICENSE](LICENSE)),
+inherited from the OpenDAoC-based project this fork came from. The dependencies below keep their own
+licenses, listed here for attribution.
+
 Preserve these and all per-file notices; dependencies may have other licenses. The project's
 AI-developed additions do not remove upstream attribution.
 
