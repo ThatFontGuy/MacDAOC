@@ -11,8 +11,14 @@
 **/user.dat
 **/save/
 
-# Converted game content (derived from the original client's files; not checked into Git).
-/source/new-client/godot/content/
+# Converted game content (derived from the original client's files; not checked into Git). No
+# trailing slash: this is a symlink on dev machines, and a trailing slash would only match a
+# real directory.
+/source/new-client/godot/content
+
+# Local offline NuGet source (the Godot .NET build's own GodotSharp packages); a per-machine
+# symlink/copy, not part of the source checkout.
+/source/new-client/tools/godot_net/
 
 # Generated output and local caches.
 **/bin/
