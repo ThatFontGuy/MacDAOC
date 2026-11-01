@@ -1,10 +1,8 @@
-# The new client (0.36c) - source
+# The new client - source
 
-The new client is a game client for the Offline DAoC server, built in Godot 4.7 (.NET). It speaks the DAoC
-network protocol of the original client (game client version 1.127) to the same server as 0.36b, so it needs no
-server changes: everything it shows is decoded from packets the server already sends. Players get it ready to
-play from the [v0.36c release](https://github.com/shadowofze/OfflineDAoC/releases/tag/v0.36c); see
-[docs/NEW-CLIENT.md](../../docs/NEW-CLIENT.md).
+The new client is a game client for a DAoC server (OpenDAoC-based, 1.65 rules), built in Godot 4.7 (.NET). It
+speaks the original DAoC network protocol (game client version 1.127) to any compatible server, so it needs no
+server changes: everything it shows is decoded from packets the server already sends.
 
 ## Layout
 
@@ -14,24 +12,29 @@ play from the [v0.36c release](https://github.com/shadowofze/OfflineDAoC/release
 | `godot/tests/` | Headless checks and debug probes (`tests/load_check.gd` compiles scripts with the autoloads present). |
 | `godot/tools/` | Content maintenance scripts run inside Godot (`pack_scenes.gd` packs converted models into `.scn` files). |
 | `pipeline/` | The Python content pipeline: it reads the original DAoC client's files (zones, NIF models, textures, sounds, interface art, game data) and writes the converted content into `godot/content`. `nif_static.py` / `nif_character.py` read NetImmerse models (`spec/nif.xml` from NifTools). |
-| `tools/build_csharp.ps1` | Builds the C# network client into `godot/.godot/mono/temp/bin/Debug/MMOEngine.dll`. |
+| `tools/build_csharp.ps1` | Windows-only: builds the C# network client via PowerShell. |
+| `tools/build_csharp.py` | Cross-platform equivalent of the above; needs the .NET SDK's `dotnet` on PATH (or `DOTNET=/path/to/dotnet`). |
+| `tools/run_dev.py` | Launches the client from source against an already-running server, for local testing on any platform. |
 
-The repository holds the source only. The converted content (`godot/content`, about 33 GB) is derived from the
-original game client's files and comes with the 0.36c download.
+The repository holds the source only. The converted content (`godot/content`, about 33 GB) is not included; it
+has to come from a build of the matching content pipeline, or be copied/symlinked in from an existing install
+that was built from the same upstream version this source is pinned to.
 
 ## Running from source
 
-1. Install the .NET 10 SDK and Godot 4.7.2 (.NET build).
-2. Copy `new-client/godot/content` from a 0.36c install into `godot/content` (or build it with the pipeline,
-   below). `godot/content/.gdignore` must stay: Godot must not import the content folder.
-3. Build the network client: `tools\build_csharp.ps1` (run it again after every change to a `.cs` file; starting
-   the game with `--path` does not compile C#).
-4. Start a 0.36b server (its launcher), then run
-   `Godot_v4.7.2-stable_mono_win64.exe --path godot -- --server=127.0.0.1 --account=<name> --password=<password>`
-   with the account from that game's `runtime\account.txt`.
-
-The release package runs it the same way: the launcher in `new-client\runtime` (the main launcher in its new-client
-mode, `source/tools/OfflineDaoc.Launcher`) starts the engine with these arguments and `APPDATA=new-client\save`.
+1. Install the .NET 10 SDK and a Godot 4.7.2 (.NET/mono) build for your platform.
+2. Get `godot/content` into place (see above). `godot/content/.gdignore` must stay: Godot must not import the
+   content folder.
+3. Get `tools/godot_net/GodotSharp` into place: a copy or symlink of a matching Godot 4.7.2 (.NET) build's own
+   `Contents/Resources/GodotSharp` (macOS app bundle) or equivalent `GodotSharp` folder (Windows/Linux) — this is
+   the offline NuGet source `godot/nuget.config` points at for building the C# project.
+4. Build the network client: `python3 tools/build_csharp.py` (cross-platform) or `tools\build_csharp.ps1`
+   (Windows). Run it again after every change to a `.cs` file; starting the game with `--path` does not compile
+   C#.
+5. Start a server, then run:
+   `python3 tools/run_dev.py --godot /path/to/Godot(.app) --server=<host>` (prompts for account/password locally)
+   — or invoke the Godot build directly:
+   `Godot --path godot -- --server=<host> --account=<name> --password=<password>`.
 
 ## Developer mode
 
@@ -48,8 +51,10 @@ script says at its top what it builds and how to run it. A full rebuild takes ma
 rebuild, repack the scenes:
 `Godot --headless --path godot -s res://tools/pack_scenes.gd -- --force res://content/monsters/effects`.
 
-## Release
+## Packaging a standalone build
 
-`source/tools/build_newclient_036.py` builds the 0.36c package from a development copy (without `dev_mode.txt`,
-the debug probes and anyone's `save` folder) and `source/tools/seal_newclient_036.py` packs it into verified,
-independent download parts. `source/tools/sync_newclient_source.py` copies this source into the repository.
+This fork doesn't carry the release-packaging tooling upstream used (that built a full downloadable game
+package, not just the client). To produce a standalone build, export the project in the Godot editor for your
+target platform (Project > Export), with the matching export templates for Godot 4.7.2 installed, and ship the
+exported binary alongside a populated `content/` folder. Make sure `dev_mode.txt` is not present before
+exporting a build meant to leave your machine.
